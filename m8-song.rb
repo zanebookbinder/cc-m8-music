@@ -1,8 +1,61 @@
 # Zane's song
 
-tempo = 60
+# play a background drum beat, with varied patterns and panning
+define :drum_background do |i|
+  sleep(0.6)
+  sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: -1
+  sleep(0.3)
+  sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
+  sleep(0.6)
+  
+  # Switch up the beat a bit every 2nd and 4th measure
+  if i == 0 or i == 2 then
+    sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: -1
+    sleep(0.3)
+    sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
+    sleep(0.6)
+  elsif i == 1 then
+    sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: -1
+    sleep(0.3)
+    sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
+    sleep(0.3)
+    sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
+    sleep(0.3)
+  else
+    sleep(0.6)
+    sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: -1
+    sleep(0.3)
+  end
+end
 
-define :play_chords_three_times do |chord_list, amp|
+# Play a single base note when the 1st and 3rd chords are played
+define :bass_note do |chord_to_play|
+  use_synth :bass_foundation
+  sleep(1.5)
+  play invert_chord(chord_to_play, 2), amp: 0.7, attack: 0.2, release: 0.2
+end
+
+# Play a soft kalimba (similar to a xylophone?) melody
+define :melody do |chord_to_play|
+  use_synth :kalimba
+  sleep(0.05)
+  play chord_to_play, amp: 5
+  sleep(0.8)
+  play chord_to_play, amp: 5
+  sleep(0.5)
+end
+
+# Play a smooth guero sound
+define :guero do
+  sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/guero.wav",
+    start: 0.09,
+    finish: 0.32,
+    rate: 0.93,
+    amp: 0.2
+end
+
+# Repeat the given chords three times (inverted differently each time)
+define :play_chords_three_times do |chord_list, amp, cycles|
   loop_count = 0
   
   3.times do
@@ -13,26 +66,34 @@ define :play_chords_three_times do |chord_list, amp|
         chord_to_play = invert_chord(chord_to_play, loop_count)
       end
       
-      play chord_to_play, attack: 1.1, release: 1.1, amp: amp
-      
-      sleep(0.6)
-      sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: -1
-      sleep(0.3)
-      sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
-      sleep(0.6)
-      sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: -1
-      sleep(0.3)
-      
-      # Switch up the beat a bit every 4th note
-      if i < 3 then
-        sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
-        sleep(0.6)
-      else
-        sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
-        sleep(0.3)
-        sample :drum_heavy_kick, amp: 0.4, attack: 0, release: 0, pan: 1
-        sleep(0.3)
+      # play the main chord for the first two cycles
+      if cycles < 2 then
+        play chord_to_play, attack: 1.1, release: 1.1, amp: amp
       end
+      
+      # add base note for second cycle
+      if cycles == 1 and (i == 0 or i == 2) then
+        in_thread do
+          bass_note chord_to_play
+        end
+      end
+      
+      # add guero for second cycle
+      if cycles == 1 then
+        in_thread do
+          guero
+        end
+      end
+      
+      # add kalimba for second and third cycles
+      if cycles >= 1 then
+        in_thread do
+          melody chord_to_play
+        end
+      end
+      
+      # always add drums
+      drum_background i
       
       i += 1
     end
@@ -41,41 +102,18 @@ define :play_chords_three_times do |chord_list, amp|
   end
 end
 
-# Four-chord melodies (base for 2nd part of song)
-in_thread do
-  ##| sleep(65)
-  
-  loop_count = 0
-  amplitudes = [1, 0.5] + Array.new(50, 0.3)
-  live_loop :enlivening_chords do
-    use_synth :organ_tonewheel
-    
-    chord_order = [chord(:b, :major), chord(:d, :major), chord(:c, :major), chord(:d, :major)]
-    play_chords_three_times chord_order, amplitudes[loop_count]
-    
-    more_chords = [chord(:c, :major), chord(:d, :major), chord(:a, :major), chord(:b, :major)]
-    play_chords_three_times more_chords, amplitudes[loop_count]
-    
-    loop_count += 1
-  end
-end
-
-
-##| Bird songs and notes that grow in amplitude
-in_thread do
-  
-  sleep(10000)
-  
+##| Notes that grow in amplitude and bird sounds
+define :slow_chords do |n_repeats, bird_sounds, starting_amplitudes, decrease_amp|
   main_chord_choices = [chord(:f, :major), chord(:c, :major), chord(:d, :major), chord(:b, :major)]
   pan = -1
   loop_count = 0
-  starting_amplitudes = [0.25, 0.5, 0.75]
   go_right = true
   use_synth :dark_ambience
   main_chord = main_chord_choices.sample
   chord_to_play = chord(:d, :major)
+  tempo = 60
   
-  8.times do
+  n_repeats.times do
     use_bpm tempo
     tempo -= 2
     
@@ -88,10 +126,12 @@ in_thread do
     chord_to_play = new_note
     
     # sample of birds chirping that gets louder over the course of the first minute
-    sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/birds-chirping-sound.wav",
-      start: loop_count * 0.05,
-      finish: loop_count * 0.05 + 0.05,
-      amp: [0, rrand(0.15 * loop_count - 0.5, 0.15 * loop_count + 0.5)].max()
+    if bird_sounds then
+      sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/birds-chirping-sound.wav",
+        start: loop_count * 0.05,
+        finish: loop_count * 0.05 + 0.05,
+        amp: [0, rrand(0.15 * loop_count - 0.5, 0.15 * loop_count + 0.5)].max()
+    end
     
     # Repeat that note at varying amplitudes and pans for 7.5 seconds
     30.times do
@@ -101,9 +141,15 @@ in_thread do
         pan = -1
       end
       
+      random_amp = starting_amplitudes.collect{|n| n + (0.1 * loop_count)}.sample
+      # Lower volume towards end of song
+      if decrease_amp then
+        random_amp = [starting_amplitudes.collect{|n| n - (0.15 * loop_count)}.sample, 0.1].max()
+      end
+      
       play chord_to_play,
         pan: pan,
-        amp: starting_amplitudes.collect{|n| n + (0.1 * loop_count)}.sample,
+        amp: random_amp,
         attack: 1,
         release: 1
       
@@ -130,3 +176,39 @@ in_thread do
   end
 end
 
+
+
+
+# Main Threads
+#########################
+
+# Thread for first minute of song
+in_thread do
+  ##| sleep(1000)
+  slow_chords 8, true, [0.25, 0.5, 0.75], false
+end
+
+# Four-chord melodies (base for 2nd part of song)
+in_thread do
+  sleep(65)
+  
+  loop_count = 0
+  amplitudes = [1, 0.5] + Array.new(50, 0.3)
+  3.times do
+    use_synth :organ_tonewheel
+    
+    chord_order = [chord(:b, :major), chord(:d, :major), chord(:c, :major), chord(:d, :major)]
+    play_chords_three_times chord_order, amplitudes[loop_count], loop_count
+    
+    more_chords = [chord(:c, :major), chord(:d, :major), chord(:a, :major), chord(:b, :major)]
+    play_chords_three_times more_chords, amplitudes[loop_count], loop_count
+    
+    loop_count += 1
+  end
+end
+
+# Thread for last minute of song
+in_thread do
+  sleep(234)
+  slow_chords 8, false, [1, 1.25, 1.5], true
+end

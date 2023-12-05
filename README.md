@@ -1,43 +1,34 @@
-# cc-m8-music
+# Song title: Earthrise and Sunset
 
-### Three music pieces that I find relaxing:
+### How to run
+1. Open the included `m8-song.rb` file in Sonic Pi.
+2. Change the filepath strings for all three samples (on lines 50, 188, and 217) 
+to reflect the directory where this repo is stored on your machine. 
+3. Hit the run button to play the song!
 
-#### Weightless - Marconi Union
-I did a study in my Brains in Motion class about the effects of music videos
-on heart rate, and I used this song as the "relaxing" test case, so I've known
-about it for a while now. I think what makes it so relaxing for me is the 
-constant hum underneath the more prominant xylophone sounds. It's very 
-consistent, so it isn't jarring at all. That steadiness makes the song remind 
-me of feeling calm, which would definitely help when prepping for a test.
+### Explanation
+My song consists of three parts: a buildup, a climax, and a conclusion. They 
+correspond to a sunrise, day, and sunset, which was the inspiration for my song.
 
-#### Coffee Relaxing Jazz (https://www.youtube.com/@coffeerelaxingjazz)
-The videos that this YouTube channel posts are very calming because the drums
-are very soft (I think they might use something other than a drumstick) and the
-piano notes are relatively high on the scale. It makes me feel comfort because
-the melody feels simple and familiar. I think that sense of comfort would allow
-me to dive into studying without distraction or worry, and in that way would
-be very helpful.
+The first part consists of long ambiance notes with birds chirping in the 
+background. Some extra features I added were a random choice of chords, a tempo
+that slows down, and pan values that cause the notes to flow back and forth
+between the left and right speakers.
 
-#### Space Song by Beach House
-This song is very relaxing because the lyrics are almost hypotizingly-calming. 
-Similarly to Weightless, it also has a constant hum in the background that 
-creates consistency between lyrics and more prominent instruments. The words 
-and notes remind me of sadness, but in a very calm way (not distraught). This 
-song repeats the same sequences of notes multiple times, which would also help
-to avoid distractions while studying. It doesn't grab the listeners attention,
-but instead serves as great background music.
+The second part of the song includes a bunch of instruments. The centerpiece 
+(and constant background notes) of the song are a sequence of chords that I 
+chose, with an accompanying drum beat that isn't too agressive. Later on, I add
+in a guero (Latin American percussion instrument) and a kalimba (African hand
+piano), which make the song more melodic and interesting, while maintaining the
+relaxation. There are also piano chords to add a little bit of spice. Towards 
+the end of the second part, most of the instruments fade out and leave just the
+kalimba and the drums.
 
-### Musical Idea
-I think that I want my musical idea to be sunrise. Watching a sunrise is a very
-soothing and long process, and it has that same consistency that some of the 
-songs above do. I think starting from lower/quieter notes and building slowly
-upwards would be a good theme. I think a song like that would both calm the 
-listener and build them up to go crush the test!
+The third part of the song is the same as the first except that the bird noises
+are replaced by wave sounds. The amplitude of the notes slowly fade until they 
+are very quiet when the song ends.
 
-### Features that I'll want to include
-- relatively low bpm (I like the idea of starting around 60bpm and lowering to
-50bpm)
-- a constant background sound
-- gentle notes (maybe pan-flute or piano)
-- flowing sensation across the notes
-- at least 5 minutes
+### Credits
+Birds chirping sound: https://orangefreesounds.com/free-birds-chirping-sound-effect/#google_vignette
+Guero sound: https://www.videvo.net/sound-effect/percussion-guiro-01/435433/#rs=audio-title
+Wave sound: https://pixabay.com/sound-effects/sandy-beach-calm-waves-water-nature-sounds-8052/
