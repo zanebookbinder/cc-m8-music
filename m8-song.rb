@@ -1,4 +1,4 @@
-# Zane's song
+# Zane's song: Earthrise and Sunset
 
 # play a background drum beat, with varied patterns and panning
 define :drum_background do |i|
@@ -35,7 +35,7 @@ define :bass_note do |chord_to_play|
   play invert_chord(chord_to_play, 2), amp: 0.7, attack: 0.2, release: 0.2
 end
 
-# Play a soft kalimba (similar to a xylophone?) melody
+# Play a soft kalimba (African hand piano) melody
 define :melody do |chord_to_play|
   use_synth :kalimba
   sleep(0.05)
@@ -45,7 +45,7 @@ define :melody do |chord_to_play|
   sleep(0.5)
 end
 
-# Play a smooth guero sound
+# Play a smooth guero (South American percussion instrument) sound
 define :guero do
   sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/guero.wav",
     start: 0.09,
@@ -58,9 +58,11 @@ end
 define :play_chords_three_times do |chord_list, amp, cycles|
   loop_count = 0
   
-  3.times do
+  3.times do # 3 loops of all chords
     i = 0
-    4.times do
+    4.times do # four chords in each sequence
+      
+      # choose the correct chord from the list
       chord_to_play = chord_list[i]
       if loop_count > 0 then
         chord_to_play = invert_chord(chord_to_play, loop_count)
@@ -102,8 +104,8 @@ define :play_chords_three_times do |chord_list, amp, cycles|
   end
 end
 
-##| Notes that grow in amplitude and bird sounds
-define :slow_chords do |n_repeats, bird_sounds, starting_amplitudes, decrease_amp|
+##| Notes that grow in amplitude and bird/wave sounds
+define :slow_chords do |n_repeats, sound_to_play, starting_amplitudes, decrease_amp|
   main_chord_choices = [chord(:f, :major), chord(:c, :major), chord(:d, :major), chord(:b, :major)]
   pan = -1
   loop_count = 0
@@ -117,7 +119,7 @@ define :slow_chords do |n_repeats, bird_sounds, starting_amplitudes, decrease_am
     use_bpm tempo
     tempo -= 2
     
-    # Choose a different note to play next
+    # Choose a different note to play next (avoid repeats)
     new_note = chord_to_play
     while chord_to_play == new_note do
       new_note = [main_chord, invert_chord(main_chord, 1), invert_chord(main_chord, 2)].sample
@@ -125,15 +127,13 @@ define :slow_chords do |n_repeats, bird_sounds, starting_amplitudes, decrease_am
     
     chord_to_play = new_note
     
-    # sample of birds chirping that gets louder over the course of the first minute
-    if bird_sounds then
-      sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/birds-chirping-sound.wav",
-        start: loop_count * 0.05,
-        finish: loop_count * 0.05 + 0.05,
-        amp: [0, rrand(0.15 * loop_count - 0.5, 0.15 * loop_count + 0.5)].max()
-    end
+    # sample that gets louder over the course of the first minute
+    sample sound_to_play,
+      start: loop_count * 0.05,
+      finish: loop_count * 0.05 + 0.05,
+      amp: [0, rrand(0.15 * loop_count - 0.5, 0.15 * loop_count + 0.5)].max()
     
-    # Repeat that note at varying amplitudes and pans for 7.5 seconds
+    # Repeat that note at varying amplitudes and pan values for 7.5 seconds
     30.times do
       if pan > 1 then
         pan = 1
@@ -141,8 +141,10 @@ define :slow_chords do |n_repeats, bird_sounds, starting_amplitudes, decrease_am
         pan = -1
       end
       
+      # increase volume when starting song
       random_amp = starting_amplitudes.collect{|n| n + (0.1 * loop_count)}.sample
-      # Lower volume towards end of song
+      
+      # decrease volume when ending song
       if decrease_amp then
         random_amp = [starting_amplitudes.collect{|n| n - (0.15 * loop_count)}.sample, 0.1].max()
       end
@@ -177,15 +179,15 @@ define :slow_chords do |n_repeats, bird_sounds, starting_amplitudes, decrease_am
 end
 
 
-
-
-# Main Threads
+# Main Song Threads
 #########################
 
 # Thread for first minute of song
 in_thread do
-  ##| sleep(1000)
-  slow_chords 8, true, [0.25, 0.5, 0.75], false
+  slow_chords 8,
+    "/Users/zanebookbinder/Desktop/CC/cc-m8-music/birds-chirping-sound.wav",
+    [0.25, 0.5, 0.75],
+    false
 end
 
 # Four-chord melodies (base for 2nd part of song)
@@ -193,15 +195,16 @@ in_thread do
   sleep(65)
   
   loop_count = 0
-  amplitudes = [1, 0.5] + Array.new(50, 0.3)
+  first_chord_set = [chord(:b, :major), chord(:d, :major), chord(:c, :major), chord(:d, :major)]
+  second_chord_set = [chord(:c, :major), chord(:d, :major), chord(:a, :major), chord(:b, :major)]
+
+  # decrease the amplitude of the main note over time
+  amplitudes = [1, 0.5, 0.3]
   3.times do
     use_synth :organ_tonewheel
     
-    chord_order = [chord(:b, :major), chord(:d, :major), chord(:c, :major), chord(:d, :major)]
-    play_chords_three_times chord_order, amplitudes[loop_count], loop_count
-    
-    more_chords = [chord(:c, :major), chord(:d, :major), chord(:a, :major), chord(:b, :major)]
-    play_chords_three_times more_chords, amplitudes[loop_count], loop_count
+    play_chords_three_times first_chord_set, amplitudes[loop_count], loop_count
+    play_chords_three_times second_chord_set, amplitudes[loop_count], loop_count
     
     loop_count += 1
   end
@@ -210,5 +213,8 @@ end
 # Thread for last minute of song
 in_thread do
   sleep(234)
-  slow_chords 8, false, [1, 1.25, 1.5], true
+  slow_chords 8,
+    "/Users/zanebookbinder/Desktop/CC/cc-m8-music/waves.wav",
+    [1, 1.25, 1.5],
+    true
 end
