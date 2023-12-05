@@ -115,6 +115,12 @@ define :slow_chords do |n_repeats, sound_to_play, starting_amplitudes, decrease_
   chord_to_play = chord(:d, :major)
   tempo = 60
   
+  # sample that gets louder over the course of the first minute
+  sample sound_to_play,
+    amp: rrand(0.4, 0.8),
+    finish: 0.4,
+    release: 5
+  
   n_repeats.times do
     use_bpm tempo
     tempo -= 2
@@ -126,12 +132,6 @@ define :slow_chords do |n_repeats, sound_to_play, starting_amplitudes, decrease_
     end
     
     chord_to_play = new_note
-    
-    # sample that gets louder over the course of the first minute
-    sample sound_to_play,
-      start: loop_count * 0.05,
-      finish: loop_count * 0.05 + 0.05,
-      amp: [0, rrand(0.15 * loop_count - 0.5, 0.15 * loop_count + 0.5)].max()
     
     # Repeat that note at varying amplitudes and pan values for 7.5 seconds
     30.times do
@@ -197,7 +197,7 @@ in_thread do
   loop_count = 0
   first_chord_set = [chord(:b, :major), chord(:d, :major), chord(:c, :major), chord(:d, :major)]
   second_chord_set = [chord(:c, :major), chord(:d, :major), chord(:a, :major), chord(:b, :major)]
-
+  
   # decrease the amplitude of the main note over time
   amplitudes = [1, 0.5, 0.3]
   3.times do
