@@ -47,7 +47,7 @@ end
 
 # Play a smooth guero (South American percussion instrument) sound
 define :guero do
-  sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/guero.wav",
+  sample "/Users/zanebookbinder/Desktop/CC/cc-m8-music/samples/guero.wav",
     start: 0.09,
     finish: 0.32,
     rate: 0.93,
@@ -185,7 +185,7 @@ end
 # Thread for first minute of song
 in_thread do
   slow_chords 8,
-    "/Users/zanebookbinder/Desktop/CC/cc-m8-music/birds-chirping-sound.wav",
+    "/Users/zanebookbinder/Desktop/CC/cc-m8-music/samples/birds-chirping-sound.wav",
     [0.25, 0.5, 0.75],
     false
 end
@@ -214,7 +214,7 @@ end
 in_thread do
   sleep(234)
   slow_chords 8,
-    "/Users/zanebookbinder/Desktop/CC/cc-m8-music/waves.wav",
+    "/Users/zanebookbinder/Desktop/CC/cc-m8-music/samples/waves.wav",
     [1, 1.25, 1.5],
     true
 end
